@@ -341,6 +341,8 @@ void testApp::handDetectHaar(ofxCvBlob contourDealy) {
     int width = 0;
     int height = 0;
 
+//  test line for git purposes
+
     for (int i = 0; i < contourDealy.pts.size(); i++) {
 
         if  (contourDealy.pts[i].x < cornerx)
