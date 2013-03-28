@@ -31,6 +31,12 @@ void testApp::setup(){
     finder.setScaleHaar(1.5);
     finder.setup("Hand.Cascade.1.xml");
 
+    string zeroString = "returnzero";
+    zeroString += "\n";
+    for (int i = 0; i < zeroString.length(); i++) {
+        serial.writeByte(zeroString[i]);
+    }
+
 }
 
 //--------------------------------------------------------------
@@ -119,11 +125,19 @@ void testApp::mousePressed(int x, int y, int button){
 
     string initString = "inithighfive";
     initString += "\n";
+    string endString = "endhighfive";
+    endString += "\n";
 
     for (int i = 0; i < initString.length(); i++) {
         serial.writeByte(initString[i]);
-
     }
+
+    ofSleepMillis(5000);
+
+    for (int i = 0; i < endString.length(); i++) {
+        serial.writeByte(endString[i]);
+    }
+
 
 }
 
