@@ -19,13 +19,10 @@ class testApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
-		void handDetect(ofxCvBlob contour);
-		void handDetectHaar(ofxCvBlob contourDealy);
-		void smoothContour(ofxCvBlob blobby);
+		void handDetectHaar(ofxCvGrayscaleImage imageToDetect);
 
 		ofTrueTypeFont              font;
 		ofSerial                    serial;
-		string                      keyToDisplay;
 
 		ofVideoGrabber              vidGrabber;
 		int                         camWidth;
@@ -33,25 +30,12 @@ class testApp : public ofBaseApp{
 
 		ofxCvColorImage             colorImage;
 		ofxCvGrayscaleImage         grayImage;
-		vector<ofxCvGrayscaleImage> backgroundImg;
-		vector<ofxCvGrayscaleImage>::iterator it;
-		ofxCvGrayscaleImage         backgroundImgAg;
-		ofxCvGrayscaleImage         differenceImg;
-		ofxCvContourFinder          contourFinder;
-
-		int                         threshold;
-		int                         blurLevel;
-		int                         blockSize;
-		bool                        bGaussian;
-		bool                        bLearnBG;
-        bool                        bAdaptive;
-        bool                        bFullscreen;
-
-        int                         handsFound;
-        int                         fingerTipThresh;
-        int                         webbingThresh;
-        int                         detectResolution;
 
         ofxCvHaarFinder             finder;
+
+        bool                        bFullscreen;
+
+        int                         detectedObjects;
+        int                         handsFound;
 
 };
