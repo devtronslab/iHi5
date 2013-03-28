@@ -268,7 +268,7 @@ obj/x86_64Debug/src/main.o: src/main.cpp src/testApp.h \
  ../../../addons/ofxOpenCv/src/ofxCvFloatImage.h \
  ../../../addons/ofxOpenCv/src/ofxCvShortImage.h \
  ../../../addons/ofxOpenCv/src/ofxCvContourFinder.h \
- ../../../addons/ofxOpenCv/src/ofxCvHaarFinder.h \
+ ../../../addons/ofxOpenCv/src/ofxCvHaarFinder.h src/previousBlobs.h \
  ../../../libs/openFrameworks/app/ofAppGlutWindow.h \
  ../../../libs/openFrameworks/app/ofAppBaseWindow.h
 
@@ -847,6 +847,8 @@ src/testApp.h:
 ../../../addons/ofxOpenCv/src/ofxCvContourFinder.h:
 
 ../../../addons/ofxOpenCv/src/ofxCvHaarFinder.h:
+
+src/previousBlobs.h:
 
 ../../../libs/openFrameworks/app/ofAppGlutWindow.h:
 

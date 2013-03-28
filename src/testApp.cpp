@@ -11,6 +11,7 @@ void testApp::setup(){
 
     bFullscreen = false;
 
+    searchRes   = 5;
     handsFound  = 0;
 
     vidGrabber.setVerbose(true);
@@ -52,6 +53,9 @@ void testApp::update(){
 
     }
 
+    ofLog(OF_LOG_NOTICE, ofToString(prevHaarBlobs.size()));
+    ofLog(OF_LOG_NOTICE, ofToString(finder.blobs.size()));
+
 }
 
 //--------------------------------------------------------------
@@ -60,6 +64,13 @@ void testApp::draw(){
     ofPushMatrix();
     ofScale(4, 4);
     grayImage.draw(5,5);
+    ofNoFill();
+    for (int i = 0; i < finder.blobs.size(); i++) {
+
+        ofRectangle cur = finder.blobs[i].boundingRect;
+        ofRect(cur.x, cur.y, cur.width, cur.height);
+
+    }
     ofPopMatrix();
 
     font.drawString("frame rate:", 20, (ofGetWindowHeight() - 50));
@@ -138,6 +149,44 @@ void testApp::dragEvent(ofDragInfo dragInfo){
 
 void testApp::handDetectHaar(ofxCvGrayscaleImage imageToDetect) {
 
+    finder.findHaarObjects(imageToDetect);
 
+//    for (int i = 0; i < finder.blobs.size(); i++) {
+//
+//        for (int j = 0; j < prevHaarBlobs.size(); j++) {
+//
+//            if (finder.blobs[i].centroid.x > prevHaarBlobs[i].theCenter.x - searchRes &&
+//                    finder.blobs[i].centroid.x < prevHaarBlobs[i].theCenter.x + searchRes &&
+//                    finder.blobs[i].centroid.y > prevHaarBlobs[i].theCenter.y - searchRes &&
+//                    finder.blobs[i].centroid.y < prevHaarBlobs[i].theCenter.y + searchRes) {
+//
+//                prevHaarBlobs[j].bBlobFound = true;
+//                break;
+//
+//            }
+//
+//        }
+//
+//        prevHaarBlobs.push_back(previousBlobs(finder.blobs[i].centroid));
+//
+//    }
+//
+//    for (prevBlobIt = prevHaarBlobs.begin(); prevBlobIt != prevHaarBlobs.end(); prevBlobIt++) {
+//
+//        previousBlobs tmpBlob = *prevBlobIt;
+//
+//        if (tmpBlob.bBlobFound) {
+//
+//            tmpBlob.bBlobFound = false;
+//            tmpBlob.numFrames++;
+//
+//        }
+//        else {
+//
+//            prevHaarBlobs.erase(prevBlobIt);
+//
+//        }
+//
+//    }
 
 }

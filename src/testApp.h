@@ -4,6 +4,8 @@
 
 #include "ofxOpenCv.h"
 
+#include "previousBlobs.h"
+
 class testApp : public ofBaseApp{
 	public:
 		void setup();
@@ -21,21 +23,25 @@ class testApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
 		void handDetectHaar(ofxCvGrayscaleImage imageToDetect);
 
-		ofTrueTypeFont              font;
-		ofSerial                    serial;
+		ofTrueTypeFont                  font;
+		ofSerial                        serial;
 
-		ofVideoGrabber              vidGrabber;
-		int                         camWidth;
-		int                         camHeight;
+		ofVideoGrabber                  vidGrabber;
+		int                             camWidth;
+		int                             camHeight;
 
-		ofxCvColorImage             colorImage;
-		ofxCvGrayscaleImage         grayImage;
+		int                             searchRes;
 
-        ofxCvHaarFinder             finder;
+		ofxCvColorImage                 colorImage;
+		ofxCvGrayscaleImage             grayImage;
 
-        bool                        bFullscreen;
+        ofxCvHaarFinder                 finder;
+        vector<previousBlobs>           prevHaarBlobs;
+        vector<previousBlobs>::iterator prevBlobIt;
 
-        int                         detectedObjects;
-        int                         handsFound;
+        bool                            bFullscreen;
+
+        int                             detectedObjects;
+        int                             handsFound;
 
 };
