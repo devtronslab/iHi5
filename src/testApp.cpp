@@ -188,7 +188,7 @@ void testApp::handDetectHaar(ofxCvGrayscaleImage imageToDetect) {
             maxFrameNum = ((*prevBlobIt).numFrames > maxFrameNum) ? (*prevBlobIt).numFrames : maxFrameNum;
 
             if ((*prevBlobIt).numFrames >= 10)
-                giveHighFive();
+                notFaceCheck(grayImage, *prevBlobIt);
 
         }
         else {
@@ -205,7 +205,24 @@ void testApp::handDetectHaar(ofxCvGrayscaleImage imageToDetect) {
 
 void testApp::notFaceCheck(ofxCvGrayscaleImage theImage, previousBlobs handCandidate) {
 
+    faceFinder.findHaarObjects(theImage);
 
+    for (int i = 0; i < faceFinder.blobs.size(); i++) {
+
+        ofRectangle faceBorder = faceFinder.blobs[i].boundingRect;
+
+        if (handCandidate.theCenter.x > faceFinder.blobs[i].centroid.x - faceBorder.width/2 &&
+                handCandidate.theCenter.x < faceFinder.blobs[i].centroid.x + faceBorder.width/2 &&
+                handCandidate.theCenter.y > faceFinder.blobs[i].centroid.y - faceBorder.height/2 &&
+                handCandidate.theCenter.y < faceFinder.blobs[i].centroid.y + faceBorder.height/2) {
+
+            handCandidate.numFrames = 0;
+
+        }
+        else {
+            giveHighFive();
+        }
+    }
 
 }
 
