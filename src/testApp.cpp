@@ -27,8 +27,8 @@ void testApp::setup(){
 
     finder.setScaleHaar(1.9);
     finder.setup("Hand.Cascade.1.xml");
-//    faceFinder.setScaleHaar(1.7);
-//    faceFinder.setup("haarcascade_frontalface_default.xml");
+    faceFinder.setScaleHaar(1.7);
+    faceFinder.setup("haarcascade_frontalface_default.xml");
     maxFrameNum = 0;
 
     zeroHand();
@@ -203,9 +203,9 @@ void testApp::handDetectHaar(ofxCvGrayscaleImage imageToDetect) {
 
 }
 
-void testApp::exit() {
+void testApp::notFaceCheck(ofxCvGrayscaleImage theImage, previousBlobs handCandidate) {
 
-    zeroHand();
+
 
 }
 
@@ -235,5 +235,11 @@ void testApp::zeroHand() {
     for (int i = 0; i < zeroString.length(); i++) {
         serial.writeByte(zeroString[i]);
     }
+
+}
+
+void testApp::exit() {
+
+    zeroHand();
 
 }
