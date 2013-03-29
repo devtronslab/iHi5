@@ -204,3 +204,13 @@ void testApp::handDetectHaar(ofxCvGrayscaleImage imageToDetect) {
 //    }
 
 }
+
+void testApp::exit() {
+
+    string zeroString = "returnzero";
+    zeroString += "\n";
+    for (int i = 0; i < zeroString.length(); i++) {
+        serial.writeByte(zeroString[i]);
+    }
+
+}
