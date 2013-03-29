@@ -23,6 +23,9 @@ class testApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 		void handDetectHaar(ofxCvGrayscaleImage imageToDetect);
+		void notFaceCheck(ofxCvGrayscaleImage theImage, previousBlobs handCandidate);
+		void giveHighFive();
+		void zeroHand();
 
 		ofTrueTypeFont                  font;
 		ofSerial                        serial;
@@ -37,6 +40,7 @@ class testApp : public ofBaseApp{
 		ofxCvGrayscaleImage             grayImage;
 
         ofxCvHaarFinder                 finder;
+        ofxCvHaarFinder                 faceFinder;
         vector<previousBlobs>           prevHaarBlobs;
         vector<previousBlobs>::iterator prevBlobIt;
 
@@ -44,5 +48,6 @@ class testApp : public ofBaseApp{
 
         int                             detectedObjects;
         int                             handsFound;
+        int                             maxFrameNum;
 
 };

@@ -1,8 +1,5 @@
 #include "testApp.h"
 
-int fingerTipHits = 0;
-int webbingHits = 0;
-
 //--------------------------------------------------------------
 void testApp::setup(){
 
@@ -14,7 +11,7 @@ void testApp::setup(){
     searchRes   = 5;
     handsFound  = 0;
 
-    vidGrabber.setVerbose(true);
+//    vidGrabber.setVerbose(true);
     vidGrabber.initGrabber(camWidth, camHeight);
 
     colorImage.allocate(camWidth, camHeight);
@@ -28,14 +25,13 @@ void testApp::setup(){
     serial.enumerateDevices();
     serial.setup("/dev/ttyACM0", 9600);
 
-    finder.setScaleHaar(1.5);
+    finder.setScaleHaar(1.9);
     finder.setup("Hand.Cascade.1.xml");
+//    faceFinder.setScaleHaar(1.7);
+//    faceFinder.setup("haarcascade_frontalface_default.xml");
+    maxFrameNum = 0;
 
-    string zeroString = "returnzero";
-    zeroString += "\n";
-    for (int i = 0; i < zeroString.length(); i++) {
-        serial.writeByte(zeroString[i]);
-    }
+    zeroHand();
 
 }
 
@@ -45,7 +41,6 @@ void testApp::update(){
     bool bNewFrame;
 
     handsFound = 0;
-    fingerTipHits   = 0;
 
     vidGrabber.update();
     bNewFrame = vidGrabber.isFrameNew();
@@ -59,8 +54,8 @@ void testApp::update(){
 
     }
 
-    ofLog(OF_LOG_NOTICE, ofToString(prevHaarBlobs.size()));
-    ofLog(OF_LOG_NOTICE, ofToString(finder.blobs.size()));
+//    ofLog(OF_LOG_NOTICE, "size of prev blobs vector: " + ofToString(prevHaarBlobs.size()));
+//    ofLog(OF_LOG_NOTICE, "size of haar blobs vector: " + ofToString(finder.blobs.size()));
 
 }
 
@@ -87,6 +82,11 @@ void testApp::draw(){
     font.drawString("number of hands found:", 20, (ofGetWindowHeight() - 150));
     font.drawString(ofToString(handsFound), 400, (ofGetWindowHeight() - 150));
 
+    font.drawString("search resolution: ", 500, (ofGetWindowHeight() - 50));
+    font.drawString(ofToString(searchRes), 850, (ofGetWindowHeight() - 50));
+    font.drawString("max blob lifetime: ", 500, (ofGetWindowHeight() - 100));
+    font.drawString(ofToString(maxFrameNum), 850, (ofGetWindowHeight() - 100));
+
     ofSetColor(255,255,255);
 
 }
@@ -99,8 +99,13 @@ void testApp::keyPressed(int key){
             bFullscreen = !bFullscreen;
             ofSetFullscreen(bFullscreen);
             break;
+        case ',':
+            searchRes--;
+            break;
+        case '.':
+            searchRes++;
+            break;
     }
-    serial.writeByte(key);
 
 
 }
@@ -123,21 +128,7 @@ void testApp::mouseDragged(int x, int y, int button){
 //--------------------------------------------------------------
 void testApp::mousePressed(int x, int y, int button){
 
-    string initString = "inithighfive";
-    initString += "\n";
-    string endString = "endhighfive";
-    endString += "\n";
-
-    for (int i = 0; i < initString.length(); i++) {
-        serial.writeByte(initString[i]);
-    }
-
-    ofSleepMillis(5000);
-
-    for (int i = 0; i < endString.length(); i++) {
-        serial.writeByte(endString[i]);
-    }
-
+    giveHighFive();
 
 }
 
@@ -165,47 +156,79 @@ void testApp::handDetectHaar(ofxCvGrayscaleImage imageToDetect) {
 
     finder.findHaarObjects(imageToDetect);
 
-//    for (int i = 0; i < finder.blobs.size(); i++) {
-//
-//        for (int j = 0; j < prevHaarBlobs.size(); j++) {
-//
-//            if (finder.blobs[i].centroid.x > prevHaarBlobs[i].theCenter.x - searchRes &&
-//                    finder.blobs[i].centroid.x < prevHaarBlobs[i].theCenter.x + searchRes &&
-//                    finder.blobs[i].centroid.y > prevHaarBlobs[i].theCenter.y - searchRes &&
-//                    finder.blobs[i].centroid.y < prevHaarBlobs[i].theCenter.y + searchRes) {
-//
-//                prevHaarBlobs[j].bBlobFound = true;
-//                break;
-//
-//            }
-//
-//        }
-//
-//        prevHaarBlobs.push_back(previousBlobs(finder.blobs[i].centroid));
-//
-//    }
-//
-//    for (prevBlobIt = prevHaarBlobs.begin(); prevBlobIt != prevHaarBlobs.end(); prevBlobIt++) {
-//
-//        previousBlobs tmpBlob = *prevBlobIt;
-//
-//        if (tmpBlob.bBlobFound) {
-//
-//            tmpBlob.bBlobFound = false;
-//            tmpBlob.numFrames++;
-//
-//        }
-//        else {
-//
-//            prevHaarBlobs.erase(prevBlobIt);
-//
-//        }
-//
-//    }
+    for (int i = 0; i < finder.blobs.size(); i++) {
+
+        for (int j = 0; j < prevHaarBlobs.size(); j++) {
+
+            if (finder.blobs[i].centroid.x > prevHaarBlobs[i].theCenter.x - searchRes &&
+                    finder.blobs[i].centroid.x < prevHaarBlobs[i].theCenter.x + searchRes &&
+                    finder.blobs[i].centroid.y > prevHaarBlobs[i].theCenter.y - searchRes &&
+                    finder.blobs[i].centroid.y < prevHaarBlobs[i].theCenter.y + searchRes) {
+
+//                ofLog(OF_LOG_NOTICE, "reoccuring blob!");
+                prevHaarBlobs[j].bBlobFound = true;
+                break;
+
+            }
+
+        }
+
+        prevHaarBlobs.push_back(previousBlobs(finder.blobs[i].centroid));
+
+
+    }
+
+    for (prevBlobIt = prevHaarBlobs.begin(); prevBlobIt != prevHaarBlobs.end(); prevBlobIt++) {
+
+        if ((*prevBlobIt).bBlobFound) {
+
+            (*prevBlobIt).bBlobFound = false;
+            (*prevBlobIt).numFrames++;
+//            ofLog(OF_LOG_NOTICE, "found reoccuring blob");
+            maxFrameNum = ((*prevBlobIt).numFrames > maxFrameNum) ? (*prevBlobIt).numFrames : maxFrameNum;
+
+            if ((*prevBlobIt).numFrames >= 10)
+                giveHighFive();
+
+        }
+        else {
+
+            prevHaarBlobs.erase(prevBlobIt);
+//            ofLog(OF_LOG_NOTICE, "erasing blob");
+            prevBlobIt--;   //erase command resizes vector, iterator rewind needed to prevent seg faults
+
+        }
+
+    }
 
 }
 
 void testApp::exit() {
+
+    zeroHand();
+
+}
+
+void testApp::giveHighFive() {
+
+    string initString = "inithighfive";
+    initString += "\n";
+    string endString = "endhighfive";
+    endString += "\n";
+
+    for (int i = 0; i < initString.length(); i++) {
+        serial.writeByte(initString[i]);
+    }
+
+    ofSleepMillis(5000);
+
+    for (int i = 0; i < endString.length(); i++) {
+        serial.writeByte(endString[i]);
+    }
+
+}
+
+void testApp::zeroHand() {
 
     string zeroString = "returnzero";
     zeroString += "\n";
