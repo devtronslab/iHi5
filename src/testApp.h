@@ -63,6 +63,8 @@ class testApp : public ofBaseApp{
         textField                       *USB_Address;
         textField                       *networkAddress;
 
+        bool                            handConnected;
+
         ofxOscSender                    sender;
         ofxOscReceiver                  receiver;
 

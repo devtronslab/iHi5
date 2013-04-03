@@ -10,6 +10,7 @@ void testApp::setup(){
 
     searchRes   = 5;
     handsFound  = 0;
+    handConnected = false;
 
 //    vidGrabber.setVerbose(true);
     vidGrabber.initGrabber(camWidth, camHeight);
@@ -20,10 +21,7 @@ void testApp::setup(){
     ofBackground(0);
 //    ofSetLogLevel(OF_LOG_VERBOSE);
 
-    font.loadFont("DIN.otf", 20);
-
-    devices = serial.getDeviceList();
-    serial.setup("/dev/ttyACM0", 9600);
+    font.loadFont("DIN.otf", 16);
 
     finder.setScaleHaar(1.9);
     finder.setup("Hand.Cascade.1.xml");
@@ -31,15 +29,17 @@ void testApp::setup(){
     faceFinder.setup("haarcascade_frontalface_default.xml");
     maxFrameNum = 0;
 
-    USB_Address = new textField(500, ofGetWindowHeight() - 150, 300, "/dev/ttyACM0");
-    networkAddress = new textField(1000, ofGetWindowHeight() - 50, 300, "128.192.4.254");
+    USB_Address = new textField(300, ofGetWindowHeight() - 91, 300, "/dev/ttyACM0");
+    networkAddress = new textField(300, ofGetWindowHeight() - 116, 300, "128.192.4.254");
+
+    devices = serial.getDeviceList();
+    if (serial.setup(USB_Address->fieldString, 9600)) {
+        zeroHand();
+        handConnected = true;
+    }
 
     sender.setup(networkAddress->fieldString, PORT);
     receiver.setup(PORT);
-
-    //ofSystemAlertDialog("test dialog");
-
-    zeroHand();
 
 }
 
@@ -57,7 +57,6 @@ void testApp::update(){
 
         colorImage.setFromPixels(vidGrabber.getPixels(), camWidth, camHeight);
         grayImage = colorImage;
-//        grayImage.contrastStretch();
         grayImage.blur(3);
 
         handDetectHaar(grayImage);
@@ -68,9 +67,6 @@ void testApp::update(){
     networkAddress->update();
 
     checkForOscMessage();
-
-//    ofLog(OF_LOG_NOTICE, "size of prev blobs vector: " + ofToString(prevHaarBlobs.size()));
-//    ofLog(OF_LOG_NOTICE, "size of haar blobs vector: " + ofToString(finder.blobs.size()));
 
 }
 
@@ -89,28 +85,40 @@ void testApp::draw(){
     }
     ofPopMatrix();
 
-    font.drawString("frame rate:", 20, (ofGetWindowHeight() - 50));
-    font.drawString(ofToString(ofGetFrameRate()), 400, (ofGetWindowHeight() - 50));
+    font.drawString("frame rate:", 20, (ofGetWindowHeight() - 25));
+    font.drawString(ofToString(ofGetFrameRate()), 300, (ofGetWindowHeight() - 25));
 
-    font.drawString("number of objects: ", 20, (ofGetWindowHeight() - 100));
-    font.drawString(ofToString(detectedObjects), 400, (ofGetWindowHeight() - 100));
-    font.drawString("number of hands found:", 20, (ofGetWindowHeight() - 150));
-    font.drawString(ofToString(handsFound), 400, (ofGetWindowHeight() - 150));
+    font.drawString("max blob: ", 20, (ofGetWindowHeight() - 50));
+    font.drawString(ofToString(maxFrameNum), 300, (ofGetWindowHeight() - 50));
 
-    font.drawString("search resolution: ", 500, (ofGetWindowHeight() - 50));
-    font.drawString(ofToString(searchRes), 850, (ofGetWindowHeight() - 50));
-    font.drawString("max blob lifetime: ", 500, (ofGetWindowHeight() - 100));
-    font.drawString(ofToString(maxFrameNum), 850, (ofGetWindowHeight() - 100));
-
-    for (int i = 0; i < devices.size(); i++) {
-        font.drawString(devices[i].getDeviceName(), 1200, (ofGetWindowHeight() - 50*i));
-
-    }
+//    for (int i = 0; i < devices.size(); i++) {
+//        font.drawString(devices[i].getDeviceName(), 1200, (ofGetWindowHeight() - 50*i));
+//
+//    }
 
     ofSetColor(255,255,255);
 
+    font.drawString("USB address for hand: ", 20, (ofGetWindowHeight() - 75));
     USB_Address->draw();
+    font.drawString("Network address: ", 20, (ofGetWindowHeight() - 100));
     networkAddress->draw();
+
+    if (handConnected) {
+        ofPushMatrix();
+            ofSetColor(0,255,0);
+            ofFill();
+            ofRect(650, (ofGetWindowHeight() - 91), 16, 16);
+        ofPopMatrix();
+    }
+    else {
+        ofPushMatrix();
+            ofSetColor(255,0,0);
+            ofNoFill();
+            ofRect(650, (ofGetWindowHeight() - 91), 16, 16);
+        ofPopMatrix();
+    }
+
+    ofSetColor(255,255,255);
 
 }
 
@@ -122,7 +130,10 @@ void testApp::keyPressed(int key){
             USB_Address->delChar();
         }
         else if (key == 13) {
-            serial.setup(USB_Address->fieldString, 9600);
+            if (serial.setup(USB_Address->fieldString, 9600)) {
+                zeroHand();
+                handConnected = true;
+            }
             USB_Address->deactivate();
         }
         else {
@@ -232,7 +243,6 @@ void testApp::handDetectHaar(ofxCvGrayscaleImage imageToDetect) {
                     finder.blobs[i].centroid.y > prevHaarBlobs[i].theCenter.y - searchRes &&
                     finder.blobs[i].centroid.y < prevHaarBlobs[i].theCenter.y + searchRes) {
 
-//                ofLog(OF_LOG_NOTICE, "reoccuring blob!");
                 prevHaarBlobs[j].bBlobFound = true;
                 break;
 
@@ -254,15 +264,18 @@ void testApp::handDetectHaar(ofxCvGrayscaleImage imageToDetect) {
 //            ofLog(OF_LOG_NOTICE, "found reoccuring blob");
             maxFrameNum = ((*prevBlobIt).numFrames > maxFrameNum) ? (*prevBlobIt).numFrames : maxFrameNum;
 
-            if ((*prevBlobIt).numFrames >= 10)
+            if ((*prevBlobIt).numFrames >= 5) {
                 if (notFaceCheck(grayImage, *prevBlobIt)) {
                     (*prevBlobIt).numFrames = 0;
                     giveHighFive();
                     sendHighFiveMessage();
+                    maxFrameNum = 0;
                 }
                 else {
                     (*prevBlobIt).numFrames = 0;
+                    ofLog(OF_LOG_NOTICE, "face found");
                 }
+            }
 
         }
         else {
@@ -310,14 +323,14 @@ void testApp::giveHighFive() {
 
     ofLog(OF_LOG_WARNING, "sending high five initialization");
     for (int i = 0; i < initString.length(); i++) {
-        serial.writeByte(initString[i]);
+        handConnected = serial.writeByte(initString[i]);
     }
 
     ofSleepMillis(5000);
 
     ofLog(OF_LOG_WARNING, "sending high five termination");
     for (int i = 0; i < endString.length(); i++) {
-        serial.writeByte(endString[i]);
+        handConnected = serial.writeByte(endString[i]);
     }
 
 }
