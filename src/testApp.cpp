@@ -18,11 +18,11 @@ void testApp::setup(){
     grayImage.allocate(camWidth, camHeight);
 
     ofBackground(0);
-    ofSetLogLevel(OF_LOG_VERBOSE);
+//    ofSetLogLevel(OF_LOG_VERBOSE);
 
     font.loadFont("DIN.otf", 20);
 
-    serial.enumerateDevices();
+    devices = serial.getDeviceList();
     serial.setup("/dev/ttyACM0", 9600);
 
     finder.setScaleHaar(1.9);
@@ -30,6 +30,14 @@ void testApp::setup(){
     faceFinder.setScaleHaar(1.7);
     faceFinder.setup("haarcascade_frontalface_default.xml");
     maxFrameNum = 0;
+
+    USB_Address = new textField(500, ofGetWindowHeight() - 150, 300, "/dev/ttyACM0");
+    networkAddress = new textField(1000, ofGetWindowHeight() - 50, 300, "128.192.4.254");
+
+    sender.setup(networkAddress->fieldString, PORT);
+    receiver.setup(PORT);
+
+    //ofSystemAlertDialog("test dialog");
 
     zeroHand();
 
@@ -49,10 +57,17 @@ void testApp::update(){
 
         colorImage.setFromPixels(vidGrabber.getPixels(), camWidth, camHeight);
         grayImage = colorImage;
+//        grayImage.contrastStretch();
+        grayImage.blur(3);
 
         handDetectHaar(grayImage);
 
     }
+
+    USB_Address->update();
+    networkAddress->update();
+
+    checkForOscMessage();
 
 //    ofLog(OF_LOG_NOTICE, "size of prev blobs vector: " + ofToString(prevHaarBlobs.size()));
 //    ofLog(OF_LOG_NOTICE, "size of haar blobs vector: " + ofToString(finder.blobs.size()));
@@ -87,25 +102,65 @@ void testApp::draw(){
     font.drawString("max blob lifetime: ", 500, (ofGetWindowHeight() - 100));
     font.drawString(ofToString(maxFrameNum), 850, (ofGetWindowHeight() - 100));
 
+    for (int i = 0; i < devices.size(); i++) {
+        font.drawString(devices[i].getDeviceName(), 1200, (ofGetWindowHeight() - 50*i));
+
+    }
+
     ofSetColor(255,255,255);
+
+    USB_Address->draw();
+    networkAddress->draw();
 
 }
 
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
 
-    switch (key) {
-        case 'f':
-            bFullscreen = !bFullscreen;
-            ofSetFullscreen(bFullscreen);
-            break;
-        case ',':
-            searchRes--;
-            break;
-        case '.':
-            searchRes++;
-            break;
+    if (USB_Address->isSelected()) {
+        if (key == 8) {
+            USB_Address->delChar();
+        }
+        else if (key == 13) {
+            serial.setup(USB_Address->fieldString, 9600);
+            USB_Address->deactivate();
+        }
+        else {
+            USB_Address->addChar((char)key);
+        }
     }
+    else if (networkAddress->isSelected()){
+
+        if (key == 8) {
+            networkAddress->delChar();
+        }
+        else if (key == 13) {
+            sender.setup(networkAddress->fieldString, PORT);
+            networkAddress->deactivate();
+        }
+        else {
+            networkAddress->addChar((char)key);
+        }
+
+    }
+    else {
+
+        switch (key) {
+            case 'f':
+                bFullscreen = !bFullscreen;
+                ofSetFullscreen(bFullscreen);
+                break;
+            case ',':
+                searchRes--;
+                break;
+            case '.':
+                searchRes++;
+                break;
+        }
+
+    }
+
+
 
 
 }
@@ -128,7 +183,19 @@ void testApp::mouseDragged(int x, int y, int button){
 //--------------------------------------------------------------
 void testApp::mousePressed(int x, int y, int button){
 
-    giveHighFive();
+    ofPoint mousePoint;
+    mousePoint.set(x, y);
+    if (USB_Address->clickedIn(mousePoint)) {
+        USB_Address->activate();
+        networkAddress->deactivate();
+    }
+    else if (networkAddress->clickedIn(mousePoint)) {
+        networkAddress->activate();
+        USB_Address->deactivate();
+    }
+    else {
+        USB_Address->deactivate();
+    }
 
 }
 
@@ -188,7 +255,14 @@ void testApp::handDetectHaar(ofxCvGrayscaleImage imageToDetect) {
             maxFrameNum = ((*prevBlobIt).numFrames > maxFrameNum) ? (*prevBlobIt).numFrames : maxFrameNum;
 
             if ((*prevBlobIt).numFrames >= 10)
-                notFaceCheck(grayImage, *prevBlobIt);
+                if (notFaceCheck(grayImage, *prevBlobIt)) {
+                    (*prevBlobIt).numFrames = 0;
+                    giveHighFive();
+                    sendHighFiveMessage();
+                }
+                else {
+                    (*prevBlobIt).numFrames = 0;
+                }
 
         }
         else {
@@ -203,7 +277,7 @@ void testApp::handDetectHaar(ofxCvGrayscaleImage imageToDetect) {
 
 }
 
-void testApp::notFaceCheck(ofxCvGrayscaleImage theImage, previousBlobs handCandidate) {
+bool testApp::notFaceCheck(ofxCvGrayscaleImage theImage, previousBlobs handCandidate) {
 
     faceFinder.findHaarObjects(theImage);
 
@@ -216,11 +290,12 @@ void testApp::notFaceCheck(ofxCvGrayscaleImage theImage, previousBlobs handCandi
                 handCandidate.theCenter.y > faceFinder.blobs[i].centroid.y - faceBorder.height/2 &&
                 handCandidate.theCenter.y < faceFinder.blobs[i].centroid.y + faceBorder.height/2) {
 
-            handCandidate.numFrames = 0;
+            return false;
 
         }
         else {
-            giveHighFive();
+            return true;
+
         }
     }
 
@@ -233,12 +308,14 @@ void testApp::giveHighFive() {
     string endString = "endhighfive";
     endString += "\n";
 
+    ofLog(OF_LOG_WARNING, "sending high five initialization");
     for (int i = 0; i < initString.length(); i++) {
         serial.writeByte(initString[i]);
     }
 
     ofSleepMillis(5000);
 
+    ofLog(OF_LOG_WARNING, "sending high five termination");
     for (int i = 0; i < endString.length(); i++) {
         serial.writeByte(endString[i]);
     }
@@ -258,5 +335,40 @@ void testApp::zeroHand() {
 void testApp::exit() {
 
     zeroHand();
+
+}
+
+void testApp::sendHighFiveMessage() {
+
+    ofxOscMessage m;
+    m.setAddress("/notification");
+    m.addStringArg("incominghighfive");
+    sender.sendMessage(m);
+
+}
+
+void testApp::checkForOscMessage() {
+
+    while (receiver.hasWaitingMessages()) {
+
+        ofxOscMessage m;
+        string theMessage;
+        receiver.getNextMessage(&m);
+
+        if (m.getAddress() == "/notification") {
+            theMessage = m.getArgAsString(0);
+        }
+
+        if (theMessage == "incominghighfive") {
+            incomingHighFiveProtocol();
+        }
+    }
+
+}
+
+void testApp::incomingHighFiveProtocol() {
+
+    ofSystemAlertDialog("INCOMING HIGH FIVE!!!");
+    giveHighFive();
 
 }

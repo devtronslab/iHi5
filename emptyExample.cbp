@@ -127,6 +127,38 @@
 		<Unit filename="../../../addons/ofxOpenCv/src/ofxCvShortImage.cpp" />
 		<Unit filename="../../../addons/ofxOpenCv/src/ofxCvShortImage.h" />
 		<Unit filename="../../../addons/ofxOpenCv/src/ofxOpenCv.h" />
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/ip/IpEndpointName.cpp" />
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/ip/IpEndpointName.h" />
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/ip/NetworkingUtils.h" />
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/ip/PacketListener.h" />
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/ip/TimerListener.h" />
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/ip/UdpSocket.h" />
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/ip/posix/NetworkingUtils.cpp" />
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/ip/posix/UdpSocket.cpp" />
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/ip/win32/NetworkingUtilsWin.cpp" />
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/ip/win32/UdpSocketWin.cpp" />
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/osc/MessageMappingOscPacketListener.h" />
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/osc/OscException.h" />
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/osc/OscHostEndianness.h" />
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/osc/OscOutboundPacketStream.cpp" />
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/osc/OscOutboundPacketStream.h" />
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/osc/OscPacketListener.h" />
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/osc/OscPrintReceivedElements.cpp" />
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/osc/OscPrintReceivedElements.h" />
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/osc/OscReceivedElements.cpp" />
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/osc/OscReceivedElements.h" />
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/osc/OscTypes.cpp" />
+		<Unit filename="../../../addons/ofxOsc/libs/oscpack/src/osc/OscTypes.h" />
+		<Unit filename="../../../addons/ofxOsc/src/ofxOsc.h" />
+		<Unit filename="../../../addons/ofxOsc/src/ofxOscArg.h" />
+		<Unit filename="../../../addons/ofxOsc/src/ofxOscBundle.cpp" />
+		<Unit filename="../../../addons/ofxOsc/src/ofxOscBundle.h" />
+		<Unit filename="../../../addons/ofxOsc/src/ofxOscMessage.cpp" />
+		<Unit filename="../../../addons/ofxOsc/src/ofxOscMessage.h" />
+		<Unit filename="../../../addons/ofxOsc/src/ofxOscReceiver.cpp" />
+		<Unit filename="../../../addons/ofxOsc/src/ofxOscReceiver.h" />
+		<Unit filename="../../../addons/ofxOsc/src/ofxOscSender.cpp" />
+		<Unit filename="../../../addons/ofxOsc/src/ofxOscSender.h" />
 		<Unit filename="config.make">
 			<Option virtualFolder="build config" />
 		</Unit>
@@ -141,6 +173,8 @@
 		<Unit filename="src/testApp.h">
 			<Option virtualFolder="src/" />
 		</Unit>
+		<Unit filename="src/textField.cpp" />
+		<Unit filename="src/textField.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

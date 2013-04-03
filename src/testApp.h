@@ -6,6 +6,12 @@
 
 #include "previousBlobs.h"
 
+#include "textField.h"
+
+#include "ofxOsc.h"
+
+#define PORT 12345
+
 class testApp : public ofBaseApp{
 	public:
 		void setup();
@@ -23,12 +29,16 @@ class testApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 		void handDetectHaar(ofxCvGrayscaleImage imageToDetect);
-		void notFaceCheck(ofxCvGrayscaleImage theImage, previousBlobs handCandidate);
+		bool notFaceCheck(ofxCvGrayscaleImage theImage, previousBlobs handCandidate);
 		void giveHighFive();
+		void sendHighFiveMessage();
+		void incomingHighFiveProtocol();
+		void checkForOscMessage();
 		void zeroHand();
 
 		ofTrueTypeFont                  font;
 		ofSerial                        serial;
+		vector<ofSerialDeviceInfo>      devices;
 
 		ofVideoGrabber                  vidGrabber;
 		int                             camWidth;
@@ -49,5 +59,11 @@ class testApp : public ofBaseApp{
         int                             detectedObjects;
         int                             handsFound;
         int                             maxFrameNum;
+
+        textField                       *USB_Address;
+        textField                       *networkAddress;
+
+        ofxOscSender                    sender;
+        ofxOscReceiver                  receiver;
 
 };
