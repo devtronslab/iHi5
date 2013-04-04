@@ -4,6 +4,8 @@
 
 #include "ofxOpenCv.h"
 
+#include "ofxCvTrackedBlob.h"
+
 #include "previousBlobs.h"
 
 #include "textField.h"
