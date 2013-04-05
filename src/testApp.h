@@ -4,13 +4,15 @@
 
 #include "ofxOpenCv.h"
 
+#include "ofxCvBlobTracker.h"
 #include "ofxCvTrackedBlob.h"
+#include "ofxCvConstants_Track.h"
 
-#include "previousBlobs.h"
-
-#include "textField.h"
+#include "TextField.h"
 
 #include "ofxOsc.h"
+
+#include "BlobTrackerListener.h"
 
 #define PORT 12345
 
@@ -31,8 +33,9 @@ class testApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 		void handDetectHaar(ofxCvGrayscaleImage imageToDetect);
-		bool notFaceCheck(ofxCvGrayscaleImage theImage, previousBlobs handCandidate);
+		bool notFaceCheck(ofxCvGrayscaleImage theImage);
 		void giveHighFive();
+		void endHighFive();
 		void sendHighFiveMessage();
 		void incomingHighFiveProtocol();
 		void checkForOscMessage();
@@ -45,16 +48,16 @@ class testApp : public ofBaseApp{
 		ofVideoGrabber                  vidGrabber;
 		int                             camWidth;
 		int                             camHeight;
-
-		int                             searchRes;
-
 		ofxCvColorImage                 colorImage;
 		ofxCvGrayscaleImage             grayImage;
 
+
         ofxCvHaarFinder                 finder;
         ofxCvHaarFinder                 faceFinder;
-        vector<previousBlobs>           prevHaarBlobs;
-        vector<previousBlobs>::iterator prevBlobIt;
+
+        ofxCvBlobTracker                handTracker;
+        BlobTrackerListener             *theListener;
+
 
         bool                            bFullscreen;
 
@@ -62,10 +65,11 @@ class testApp : public ofBaseApp{
         int                             handsFound;
         int                             maxFrameNum;
 
-        textField                       *USB_Address;
-        textField                       *networkAddress;
+        TextField                       *USB_Address;
+        TextField                       *networkAddress;
 
         bool                            handConnected;
+        bool                            highFiveSent;
 
         ofxOscSender                    sender;
         ofxOscReceiver                  receiver;

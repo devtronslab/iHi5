@@ -8,9 +8,9 @@ void testApp::setup(){
 
     bFullscreen = false;
 
-    searchRes   = 5;
     handsFound  = 0;
     handConnected = false;
+    highFiveSent = false;
 
 //    vidGrabber.setVerbose(true);
     vidGrabber.initGrabber(camWidth, camHeight);
@@ -23,14 +23,14 @@ void testApp::setup(){
 
     font.loadFont("DIN.otf", 16);
 
-    finder.setScaleHaar(1.9);
+    finder.setScaleHaar(1.8);
     finder.setup("Hand.Cascade.1.xml");
-    faceFinder.setScaleHaar(1.7);
+    faceFinder.setScaleHaar(1.5);
     faceFinder.setup("haarcascade_frontalface_default.xml");
     maxFrameNum = 0;
 
-    USB_Address = new textField(300, ofGetWindowHeight() - 91, 300, "/dev/ttyACM0");
-    networkAddress = new textField(300, ofGetWindowHeight() - 116, 300, "128.192.4.254");
+    USB_Address = new TextField(300, ofGetWindowHeight() - 91, 300, "/dev/ttyACM0");
+    networkAddress = new TextField(300, ofGetWindowHeight() - 116, 300, "128.192.4.254");
 
     devices = serial.getDeviceList();
     if (serial.setup(USB_Address->fieldString, 9600)) {
@@ -40,6 +40,9 @@ void testApp::setup(){
 
     sender.setup(networkAddress->fieldString, PORT);
     receiver.setup(PORT);
+
+    theListener = new BlobTrackerListener();
+    handTracker.setListener(theListener);
 
 }
 
@@ -60,6 +63,12 @@ void testApp::update(){
         grayImage.blur(3);
 
         handDetectHaar(grayImage);
+        if (theListener->shouldHighFiveBeGiven()) {
+            endHighFive();
+            theListener->resetHighFiveStatus();
+            highFiveSent = false;
+            maxFrameNum = 0;
+        }
 
     }
 
@@ -83,7 +92,16 @@ void testApp::draw(){
         ofRect(cur.x, cur.y, cur.width, cur.height);
 
     }
+
+    for (int i = 0; i < handTracker.blobs.size(); i++) {
+
+        handTracker.blobs[i].draw(0, 0);
+
+    }
+
     ofPopMatrix();
+
+    ofSetColor(255,255,255);
 
     font.drawString("frame rate:", 20, (ofGetWindowHeight() - 25));
     font.drawString(ofToString(ofGetFrameRate()), 300, (ofGetWindowHeight() - 25));
@@ -161,12 +179,6 @@ void testApp::keyPressed(int key){
                 bFullscreen = !bFullscreen;
                 ofSetFullscreen(bFullscreen);
                 break;
-            case ',':
-                searchRes--;
-                break;
-            case '.':
-                searchRes++;
-                break;
         }
 
     }
@@ -234,55 +246,15 @@ void testApp::handDetectHaar(ofxCvGrayscaleImage imageToDetect) {
 
     finder.findHaarObjects(imageToDetect);
 
-    for (int i = 0; i < finder.blobs.size(); i++) {
+    handTracker.trackBlobs(finder.blobs);
 
-        for (int j = 0; j < prevHaarBlobs.size(); j++) {
+    for (int i = 0; i < handTracker.blobs.size(); i++) {
 
-            if (finder.blobs[i].centroid.x > prevHaarBlobs[i].theCenter.x - searchRes &&
-                    finder.blobs[i].centroid.x < prevHaarBlobs[i].theCenter.x + searchRes &&
-                    finder.blobs[i].centroid.y > prevHaarBlobs[i].theCenter.y - searchRes &&
-                    finder.blobs[i].centroid.y < prevHaarBlobs[i].theCenter.y + searchRes) {
-
-                prevHaarBlobs[j].bBlobFound = true;
-                break;
-
-            }
-
-        }
-
-        prevHaarBlobs.push_back(previousBlobs(finder.blobs[i].centroid));
-
-
-    }
-
-    for (prevBlobIt = prevHaarBlobs.begin(); prevBlobIt != prevHaarBlobs.end(); prevBlobIt++) {
-
-        if ((*prevBlobIt).bBlobFound) {
-
-            (*prevBlobIt).bBlobFound = false;
-            (*prevBlobIt).numFrames++;
-//            ofLog(OF_LOG_NOTICE, "found reoccuring blob");
-            maxFrameNum = ((*prevBlobIt).numFrames > maxFrameNum) ? (*prevBlobIt).numFrames : maxFrameNum;
-
-            if ((*prevBlobIt).numFrames >= 5) {
-                if (notFaceCheck(grayImage, *prevBlobIt)) {
-                    (*prevBlobIt).numFrames = 0;
-                    giveHighFive();
-                    sendHighFiveMessage();
-                    maxFrameNum = 0;
-                }
-                else {
-                    (*prevBlobIt).numFrames = 0;
-                    ofLog(OF_LOG_NOTICE, "face found");
-                }
-            }
-
-        }
-        else {
-
-            prevHaarBlobs.erase(prevBlobIt);
-//            ofLog(OF_LOG_NOTICE, "erasing blob");
-            prevBlobIt--;   //erase command resizes vector, iterator rewind needed to prevent seg faults
+        maxFrameNum = (handTracker.blobs[i].age > maxFrameNum) ? handTracker.blobs[i].age : maxFrameNum;
+        if (handTracker.blobs[i].age >= 30 && !highFiveSent) {
+            giveHighFive();
+            sendHighFiveMessage();
+            highFiveSent = true;
 
         }
 
@@ -290,7 +262,7 @@ void testApp::handDetectHaar(ofxCvGrayscaleImage imageToDetect) {
 
 }
 
-bool testApp::notFaceCheck(ofxCvGrayscaleImage theImage, previousBlobs handCandidate) {
+bool testApp::notFaceCheck(ofxCvGrayscaleImage theImage) {
 
     faceFinder.findHaarObjects(theImage);
 
@@ -298,18 +270,6 @@ bool testApp::notFaceCheck(ofxCvGrayscaleImage theImage, previousBlobs handCandi
 
         ofRectangle faceBorder = faceFinder.blobs[i].boundingRect;
 
-        if (handCandidate.theCenter.x > faceFinder.blobs[i].centroid.x - faceBorder.width/2 &&
-                handCandidate.theCenter.x < faceFinder.blobs[i].centroid.x + faceBorder.width/2 &&
-                handCandidate.theCenter.y > faceFinder.blobs[i].centroid.y - faceBorder.height/2 &&
-                handCandidate.theCenter.y < faceFinder.blobs[i].centroid.y + faceBorder.height/2) {
-
-            return false;
-
-        }
-        else {
-            return true;
-
-        }
     }
 
 }
@@ -318,15 +278,19 @@ void testApp::giveHighFive() {
 
     string initString = "inithighfive";
     initString += "\n";
-    string endString = "endhighfive";
-    endString += "\n";
+
 
     ofLog(OF_LOG_WARNING, "sending high five initialization");
     for (int i = 0; i < initString.length(); i++) {
         handConnected = serial.writeByte(initString[i]);
     }
 
-    ofSleepMillis(5000);
+}
+
+void testApp::endHighFive() {
+
+    string endString = "endhighfive";
+    endString += "\n";
 
     ofLog(OF_LOG_WARNING, "sending high five termination");
     for (int i = 0; i < endString.length(); i++) {
@@ -342,12 +306,6 @@ void testApp::zeroHand() {
     for (int i = 0; i < zeroString.length(); i++) {
         serial.writeByte(zeroString[i]);
     }
-
-}
-
-void testApp::exit() {
-
-    zeroHand();
 
 }
 
@@ -383,5 +341,13 @@ void testApp::incomingHighFiveProtocol() {
 
     ofSystemAlertDialog("INCOMING HIGH FIVE!!!");
     giveHighFive();
+    ofSleepMillis(2000);
+    endHighFive();
+
+}
+
+void testApp::exit() {
+
+    zeroHand();
 
 }

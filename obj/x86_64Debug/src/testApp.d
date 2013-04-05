@@ -268,8 +268,14 @@ obj/x86_64Debug/src/testApp.o: src/testApp.cpp src/testApp.h \
  ../../../addons/ofxOpenCv/src/ofxCvFloatImage.h \
  ../../../addons/ofxOpenCv/src/ofxCvShortImage.h \
  ../../../addons/ofxOpenCv/src/ofxCvContourFinder.h \
- ../../../addons/ofxOpenCv/src/ofxCvHaarFinder.h src/previousBlobs.h \
- src/textField.h ../../../addons/ofxOsc/src/ofxOsc.h \
+ ../../../addons/ofxOpenCv/src/ofxCvHaarFinder.h \
+ ../../../addons/ofxOpenCVBlobTrackingExt/src/ofxCvBlobTracker.h \
+ ../../../addons/ofxOpenCVBlobTrackingExt/src/ofxCvTrackedBlob.h \
+ ../../../addons/ofxOpenCVBlobTrackingExt/src/ofxCvConstants_Track.h \
+ ../../../addons/ofxOpenCv/src/ofxCvBlob.h \
+ ../../../addons/ofxOpenCVBlobTrackingExt/src/ofxCvTrackedBlob.h \
+ ../../../addons/ofxOpenCVBlobTrackingExt/src/ofxCvConstants_Track.h \
+ src/TextField.h ../../../addons/ofxOsc/src/ofxOsc.h \
  ../../../addons/ofxOsc/src/ofxOscArg.h \
  ../../../addons/ofxOsc/src/ofxOscMessage.h \
  ../../../addons/ofxOsc/src/ofxOscSender.h \
@@ -284,7 +290,8 @@ obj/x86_64Debug/src/testApp.o: src/testApp.cpp src/testApp.h \
  ../../../addons/ofxOsc/libs/oscpack/src/osc/../ip/PacketListener.h \
  ../../../addons/ofxOsc/libs/oscpack/src/ip/UdpSocket.h \
  ../../../addons/ofxOsc/libs/oscpack/src/ip/NetworkingUtils.h \
- ../../../addons/ofxOsc/libs/oscpack/src/ip/IpEndpointName.h
+ ../../../addons/ofxOsc/libs/oscpack/src/ip/IpEndpointName.h \
+ src/BlobTrackerListener.h
 
 src/testApp.h:
 
@@ -862,9 +869,19 @@ src/testApp.h:
 
 ../../../addons/ofxOpenCv/src/ofxCvHaarFinder.h:
 
-src/previousBlobs.h:
+../../../addons/ofxOpenCVBlobTrackingExt/src/ofxCvBlobTracker.h:
 
-src/textField.h:
+../../../addons/ofxOpenCVBlobTrackingExt/src/ofxCvTrackedBlob.h:
+
+../../../addons/ofxOpenCVBlobTrackingExt/src/ofxCvConstants_Track.h:
+
+../../../addons/ofxOpenCv/src/ofxCvBlob.h:
+
+../../../addons/ofxOpenCVBlobTrackingExt/src/ofxCvTrackedBlob.h:
+
+../../../addons/ofxOpenCVBlobTrackingExt/src/ofxCvConstants_Track.h:
+
+src/TextField.h:
 
 ../../../addons/ofxOsc/src/ofxOsc.h:
 
@@ -897,3 +914,5 @@ src/textField.h:
 ../../../addons/ofxOsc/libs/oscpack/src/ip/NetworkingUtils.h:
 
 ../../../addons/ofxOsc/libs/oscpack/src/ip/IpEndpointName.h:
+
+src/BlobTrackerListener.h:

@@ -1,0 +1,93 @@
+#include "textField.h"
+
+textField::textField(int _x, int _y, int _width, string initString)
+{
+
+    font.loadFont("DIN.otf", 12);
+    x = _x;
+    y = _y;
+    width = _width;
+    height = font.stringHeight("Blah") * 2;
+
+    theBox = ofRectangle(x, y, width, height);
+    fieldString = initString;
+    initialString = true;
+    isActivated = false;
+    cursorSwitcher = true;
+    cursorBlinker = 0;
+
+}
+
+textField::~textField()
+{
+    //dtor
+}
+
+void textField::update() {
+
+    stringWidth = font.stringWidth(fieldString);
+    cursorTop.set(x + 15 + stringWidth, y + height/4);
+    if (!cursorBlinker)
+        cursorSwitcher = !cursorSwitcher;
+    cursorBlinker = (cursorBlinker + 1) % 30;
+    theBox = ofRectangle(x, y, width, height);
+
+}
+
+void textField::draw()  {
+
+    ofPushMatrix();
+        ofSetColor(255,255,255);
+        ofNoFill();
+        ofRect(theBox);
+        font.drawString(fieldString, x + 15, y + height*3/4);
+        if (isActivated && cursorSwitcher) {
+            ofPoint cursorBottom;
+            cursorBottom.set(cursorTop.x, cursorTop.y + height/2);
+            ofLine(cursorTop, cursorBottom);
+        }
+
+    ofPopMatrix();
+
+}
+
+bool textField::clickedIn(ofPoint mousePos) {
+
+    return theBox.inside(mousePos);
+
+}
+
+void textField::activate() {
+
+    isActivated = true;
+
+}
+
+void textField::deactivate() {
+
+    isActivated = false;
+
+}
+
+bool textField::isSelected() {
+
+    return isActivated;
+
+}
+
+void textField::addChar(char additionalChar){
+
+    fieldString += additionalChar;
+
+}
+
+void textField::delChar() {
+
+    int stringIndex = fieldString.length();
+    string tmpString = "";
+    for (int i = 0; i < stringIndex - 1; i++) {
+        tmpString += fieldString[i];
+    }
+    fieldString = tmpString;
+
+}

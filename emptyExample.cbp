@@ -27,6 +27,10 @@
 				<Option projectLinkerOptionsRelation="2" />
 			</Target>
 		</Build>
+		<Unit filename="../../../addons/ofxOpenCVBlobTrackingExt/src/ofxCvBlobTracker.cpp" />
+		<Unit filename="../../../addons/ofxOpenCVBlobTrackingExt/src/ofxCvBlobTracker.h" />
+		<Unit filename="../../../addons/ofxOpenCVBlobTrackingExt/src/ofxCvConstants_Track.h" />
+		<Unit filename="../../../addons/ofxOpenCVBlobTrackingExt/src/ofxCvTrackedBlob.h" />
 		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv/cv.h" />
 		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv/cv.hpp" />
 		<Unit filename="../../../addons/ofxOpenCv/libs/opencv/include/opencv/cvaux.h" />
@@ -162,19 +166,19 @@
 		<Unit filename="config.make">
 			<Option virtualFolder="build config" />
 		</Unit>
+		<Unit filename="src/BlobTrackerListener.cpp" />
+		<Unit filename="src/BlobTrackerListener.h" />
+		<Unit filename="src/TextField.cpp" />
+		<Unit filename="src/TextField.h" />
 		<Unit filename="src/main.cpp">
 			<Option virtualFolder="src/" />
 		</Unit>
-		<Unit filename="src/previousBlobs.cpp" />
-		<Unit filename="src/previousBlobs.h" />
 		<Unit filename="src/testApp.cpp">
 			<Option virtualFolder="src/" />
 		</Unit>
 		<Unit filename="src/testApp.h">
 			<Option virtualFolder="src/" />
 		</Unit>
-		<Unit filename="src/textField.cpp" />
-		<Unit filename="src/textField.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

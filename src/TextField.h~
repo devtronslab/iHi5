@@ -1,0 +1,43 @@
+#ifndef TEXTFIELD_H
+#define TEXTFIELD_H
+
+#include "ofMain.h"
+
+class textField
+{
+    public:
+        textField(int _x, int _y, int _width, string initString);
+        virtual ~textField();
+
+        void update();
+        void draw();
+
+        bool clickedIn(ofPoint mousePos);
+        void activate();
+        void deactivate();
+        bool isSelected();
+        void addChar(char additionalChar);
+        void delChar();
+
+        string fieldString;
+        ofTrueTypeFont  font;
+
+        int x;
+        int y;
+        int width;
+        int height;
+
+    protected:
+
+        ofPoint          cursorTop;
+        int             stringWidth;
+        bool            initialString;
+        ofRectangle     theBox;
+        bool            isActivated;
+        bool            cursorSwitcher;
+        int             cursorBlinker;
+
+    private:
+};
+
+#endif // TEXTFIELD_H
