@@ -166,6 +166,8 @@
 		<Unit filename="config.make">
 			<Option virtualFolder="build config" />
 		</Unit>
+		<Unit filename="src/BlobOffEvent.cpp" />
+		<Unit filename="src/BlobOffEvent.h" />
 		<Unit filename="src/BlobTrackerListener.cpp" />
 		<Unit filename="src/BlobTrackerListener.h" />
 		<Unit filename="src/TextField.cpp" />
