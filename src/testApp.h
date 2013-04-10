@@ -34,6 +34,7 @@ class testApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
 		void handDetectHaar(ofxCvGrayscaleImage imageToDetect);
 		bool notFaceCheck(ofxCvGrayscaleImage theImage);
+		void blobDisappeared(int &_age);
 		void giveHighFive();
 		void endHighFive();
 		void sendHighFiveMessage();

@@ -2,7 +2,7 @@
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
 	<File name="../../../addons/ofxOpenCVBlobTrackingExt/src/ofxCvBlobTracker.cpp" open="1" top="0" tabpos="5">
-		<Cursor position="8509" topLine="306" />
+		<Cursor position="8509" topLine="291" />
 	</File>
 	<File name="../../../addons/ofxOpenCVBlobTrackingExt/src/ofxCvBlobTracker.h" open="0" top="0" tabpos="3">
 		<Cursor position="1301" topLine="16" />
@@ -10,8 +10,8 @@
 	<File name="../../../addons/ofxOpenCVBlobTrackingExt/src/ofxCvConstants_Track.h" open="0" top="0" tabpos="6">
 		<Cursor position="768" topLine="0" />
 	</File>
-	<File name="../../../addons/ofxOpenCVBlobTrackingExt/src/ofxCvTrackedBlob.h" open="1" top="0" tabpos="7">
-		<Cursor position="1471" topLine="23" />
+	<File name="../../../addons/ofxOpenCVBlobTrackingExt/src/ofxCvTrackedBlob.h" open="0" top="0" tabpos="7">
+		<Cursor position="1471" topLine="0" />
 	</File>
 	<File name="../../../addons/ofxOpenCv/src/ofxCvConstants.h" open="0" top="0" tabpos="0">
 		<Cursor position="121" topLine="0" />
@@ -19,22 +19,19 @@
 	<File name="../../../addons/ofxOpenCv/src/ofxCvContourFinder.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="2370" topLine="181" />
 	</File>
-	<File name="src/BlobOffEvent.h" open="1" top="0" tabpos="6">
-		<Cursor position="138" topLine="0" />
-	</File>
 	<File name="src/BlobTrackerListener.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="312" topLine="0" />
+		<Cursor position="295" topLine="0" />
 	</File>
 	<File name="src/BlobTrackerListener.h" open="1" top="0" tabpos="3">
-		<Cursor position="604" topLine="0" />
+		<Cursor position="628" topLine="0" />
 	</File>
 	<File name="src/main.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="src/testApp.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="1124" topLine="12" />
+	<File name="src/testApp.cpp" open="1" top="1" tabpos="2">
+		<Cursor position="1243" topLine="15" />
 	</File>
-	<File name="src/testApp.h" open="1" top="1" tabpos="1">
-		<Cursor position="1970" topLine="13" />
+	<File name="src/testApp.h" open="1" top="0" tabpos="1">
+		<Cursor position="844" topLine="13" />
 	</File>
 </CodeBlocks_layout_file>

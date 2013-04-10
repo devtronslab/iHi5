@@ -44,6 +44,8 @@ void testApp::setup(){
     theListener = new BlobTrackerListener();
     handTracker.setListener(theListener);
 
+    ofAddListener(theListener->blobOffEvent, this, &testApp::blobDisappeared);
+
 }
 
 //--------------------------------------------------------------
@@ -63,12 +65,12 @@ void testApp::update(){
         grayImage.blur(3);
 
         handDetectHaar(grayImage);
-        if (theListener->shouldHighFiveBeGiven()) {
-            endHighFive();
-            theListener->resetHighFiveStatus();
-            highFiveSent = false;
-            maxFrameNum = 0;
-        }
+//        if (theListener->shouldHighFiveBeGiven()) {
+//            endHighFive();
+//            theListener->resetHighFiveStatus();
+//            highFiveSent = false;
+//            maxFrameNum = 0;
+//        }
 
     }
 
@@ -269,6 +271,20 @@ bool testApp::notFaceCheck(ofxCvGrayscaleImage theImage) {
     for (int i = 0; i < faceFinder.blobs.size(); i++) {
 
         ofRectangle faceBorder = faceFinder.blobs[i].boundingRect;
+
+    }
+
+}
+
+void testApp::blobDisappeared(int &_age) {
+
+    if (_age >= 30) {
+
+        if (highFiveSent) {
+            endHighFive();
+            highFiveSent = false;
+            maxFrameNum = 0;
+        }
 
     }
 

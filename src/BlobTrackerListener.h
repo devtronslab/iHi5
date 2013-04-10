@@ -2,7 +2,7 @@
 #define BLOBTRACKERLISTENER_H
 
 #include <ofxCvConstants_Track.h>
-
+#
 
 class BlobTrackerListener : public ofxCvBlobListener
 {
@@ -21,6 +21,8 @@ class BlobTrackerListener : public ofxCvBlobListener
         void resetHighFiveStatus() {
             bHighFiveStatus = false;
         }
+
+        ofEvent<int>    blobOffEvent;
 
     protected:
     private:

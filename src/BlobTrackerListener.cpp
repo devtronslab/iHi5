@@ -12,9 +12,7 @@ BlobTrackerListener::~BlobTrackerListener()
 
 void BlobTrackerListener::blobOff( int x, int y, int id, int order, int _age ) {
 
-    if (_age >= 30) {
-        bHighFiveStatus = true;
-    }
+    ofNotifyEvent(blobOffEvent,_age,this);
 
 }
 
